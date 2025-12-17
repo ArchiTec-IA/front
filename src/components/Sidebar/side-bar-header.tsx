@@ -1,12 +1,14 @@
 "use client";
 
+import { QuioLogo } from "@/assets/icons";
+
 interface CompanyHeaderProps {
   isCollapsed: boolean;
 }
 
 const CompanyLogo = () => (
-  <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-fuchsia-400 rounded-lg flex items-center justify-center flex-shrink-0">
-    <span className="text-white font-bold text-sm">A</span>
+  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+    <QuioLogo className="w-6 h-6 text-black" />
   </div>
 );
 
@@ -16,7 +18,7 @@ export function SideBarHeader({ isCollapsed }: CompanyHeaderProps) {
       {isCollapsed ? (
         <div className="flex min-w-0 justify-start items-center gap-3 w-full">
           <CompanyLogo />
-          <span className="font-bold text-lg truncate mt-2">ArchiTec</span>
+          <span className="font-bold text-lg truncate mt-2">Boa Vista</span>
         </div>
       ) : (
         <CompanyLogo />

@@ -12,3 +12,4 @@ export { Microphone } from "./Microphone";
 export { Quio } from "./Quio";
 export { Solutions } from "./Solutions";
 export { ItemsList } from "./ItemsList";
+export { QuioLogo } from "./QuioLogo";
