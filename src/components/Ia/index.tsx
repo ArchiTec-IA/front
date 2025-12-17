@@ -29,7 +29,7 @@ import { ModeSelectionComponent } from "./components/ModeSeletion";
 import { ScrollArea } from "../ui/scroll-area";
 import { ItemsList } from "@/assets/icons";
 
-const API_BASE_URL = "http://localhost:5001";
+const API_BASE_URL = "api";
 
 export function IaComponent() {
   const dispatch = useAppDispatch();
