@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import logoImage from "@/assets/logoBoa.png";
+import logoImage from "@/assets/logo-boavista-Preto.png";
 const ANIMATION_DURATION_MS = 2500; // Duração da animação em milissegundos (2.5 segundos)
 
 export function SplashComponent({

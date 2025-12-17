@@ -64,6 +64,7 @@
 
     scrollbar-width: thin;
     scrollbar-color: var(--color-muted);
+    font-family: "Inter", sans-serif;
   }
 
   ::-webkit-scrollbar {

@@ -1,3 +1,5 @@
+import { Quio, Solutions } from "@/assets/icons";
+import logoBoaWhite from "@/assets/logo-boa-white.png";
 import { useAppDispatch } from "@/hooks/hooks";
 import { cn } from "@/lib/utils";
 import { AuthServices } from "@/services/AuthServices";
@@ -5,16 +7,9 @@ import { setCredentials } from "@/store/authSlice";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Field, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { Quio, Solutions } from "@/assets/icons";
 
 export function LoginPageComponent({
   className,
@@ -63,12 +58,15 @@ export function LoginPageComponent({
       </div>
       <div className="w-[50%] h-full flex items-center justify-center">
         <Card className="w-[60%] h-[60%] flex flex-col justify-center bg-white/15 border-none">
-          <CardHeader className="mb-14">
+          <CardHeader className="">
             <div className="flex flex-col items-center">
-              <CardTitle className="text-4xl text-white">Quio</CardTitle>
-              <CardDescription className="text-white">
-                Soluções para Moveis Projetados
-              </CardDescription>
+              <CardTitle className="text-4xl text-white">
+                <img
+                  src={logoBoaWhite}
+                  alt="Logo Quio"
+                  className="h-36 w-auto object-contain" /* Ajusta h-12 conforme o tamanho desejado */
+                />
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -91,12 +89,6 @@ export function LoginPageComponent({
                     <FieldLabel htmlFor="password" className="text-white">
                       Password
                     </FieldLabel>
-                    {/*   <a
-                      href="#"
-                      className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-white"
-                    >
-                      Forgot your password?
-                    </a> */}
                   </div>
                   <Input
                     id="password"
