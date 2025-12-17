@@ -40,7 +40,7 @@ export interface ChatState {
   error: string | null;
 }
 
-const API_BASE_URL = "http://localhost:5001";
+const API_BASE_URL = "api";
 const generateSessionId = () =>
   "session_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 
