@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -10,10 +11,34 @@ import {
 } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { useAppDispatch } from "@/hooks/hooks";
+import { addProject } from "@/store/projectSlice";
 
 export function NewProjectModal() {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [client, setClient] = useState("");
+  const dispatch = useAppDispatch();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name) return;
+
+    const newProject = {
+      id: Math.random().toString(36).substr(2, 9),
+      name,
+      client,
+    };
+
+    dispatch(addProject(newProject));
+
+    setName("");
+    setClient("");
+    setOpen(false);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-primary text-foreground font-medium hover: cursor-pointer hover:bg-primary/50">
           + Novo Projeto
@@ -21,7 +46,7 @@ export function NewProjectModal() {
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[600px] bg-background border-none rounded-xl">
-        <form onSubmit={() => console.log("submitando")}>
+        <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-foreground">
               Criar Novo Projeto
@@ -41,6 +66,8 @@ export function NewProjectModal() {
               </Label>
               <Input
                 id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="col-span-3 border-input bg-background"
               />
             </div>
@@ -53,6 +80,8 @@ export function NewProjectModal() {
               </Label>
               <Input
                 id="client"
+                value={client}
+                onChange={(e) => setClient(e.target.value)}
                 className="col-span-3 border-input bg-background"
               />
             </div>
@@ -62,6 +91,7 @@ export function NewProjectModal() {
             <Button
               type="submit"
               className="bg-primary text-accsent hover:bg-primary/70 hover:cursor-pointer"
+              disabled={!name.trim()}
             >
               Criar Projeto
             </Button>

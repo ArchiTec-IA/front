@@ -133,15 +133,7 @@ export const generateMultipleQuote = createAsyncThunk<
 const initialState: ChatState = {
   sessionId: generateSessionId(),
   mode: "single",
-  messages: [
-    {
-      id: "initial",
-      content:
-        "Olá! Sou o assistente de orçamentos. Escolha o modo de operação acima para começar.",
-      sender: "bot",
-      timestamp: new Date().toISOString(),
-    },
-  ],
+  messages: [],
   productList: [],
   pdfUrl: null,
   status: "idle",
@@ -157,19 +149,8 @@ const chatSlice = createSlice({
       state.pdfUrl = null;
       state.productList = [];
       state.sessionId = generateSessionId();
-      const welcomeMessage =
-        action.payload === "single"
-          ? 'Olá! Sou o assistente de orçamentos. Descreva o produto que deseja orçar (ex: "corrediça HAFELE", "5 divisores Von Ort").'
-          : 'Olá! Adicione os produtos que deseja orçar. Você pode adicionar um por vez ou vários de uma vez. Quando terminar, clique em "Gerar Orçamento".';
 
-      state.messages = [
-        {
-          id: generateSessionId(),
-          content: welcomeMessage,
-          sender: "bot",
-          timestamp: new Date().toISOString(),
-        },
-      ];
+      state.messages = [];
       state.error = null;
     },
     addMessage: (

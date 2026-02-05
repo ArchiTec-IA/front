@@ -1,33 +1,17 @@
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Calculator,
-  Download,
-  Send,
-  Trash2,
-  Mic,
-  List,
-  X,
-  ShoppingBag,
-} from "lucide-react";
-import { useEffect, useRef, useState, useCallback } from "react";
-import { MessagesComponent } from "./components/Messages";
-import { NoContentComponent } from "./components/NoContent";
-import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
-import {
-  sendSingleChat,
-  extractProducts,
-  generateMultipleQuote,
-  addMessage,
-  clearProductList,
-  removeProduct,
-} from "@/store/chatSlice";
-import { cn, formatCurrencyBRL } from "@/lib/utils";
-import { VoiceModal } from "./components/VoiceModal";
-import { useSpeechRecognition } from "@/hooks/use-speech-recongnition";
-import { ModeSelectionComponent } from "./components/ModeSeletion";
-import { ScrollArea } from "../ui/scroll-area";
 import { ItemsList } from "@/assets/icons";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import { useSpeechRecognition } from "@/hooks/use-speech-recongnition";
+import { cn } from "@/lib/utils";
+import { addMessage, extractProducts, sendSingleChat } from "@/store/chatSlice";
+import { Download, Mic, Send } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Aside from "./components/Aside";
+import { MessagesComponent } from "./components/Messages";
+import { ModeSelectionComponent } from "./components/ModeSeletion";
+import { NoContentComponent } from "./components/NoContent";
+import { VoiceModal } from "./components/VoiceModal";
 
 const API_BASE_URL = "api";
 
@@ -40,13 +24,11 @@ export function IaComponent() {
   const [input, setInput] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Estado para controlar a sidebar lateral
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isLoading = status === "loading";
 
-  // Abre a sidebar automaticamente na primeira adição de itens se estiver no modo multiple
   useEffect(() => {
     if (mode === "multiple" && productList.length > 0 && !isSidebarOpen) {
       setIsSidebarOpen(true);
@@ -54,7 +36,6 @@ export function IaComponent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productList.length, mode]);
 
-  // Fecha a sidebar se mudar para o modo single
   useEffect(() => {
     if (mode === "single" && isSidebarOpen) {
       setIsSidebarOpen(false);
@@ -100,11 +81,6 @@ export function IaComponent() {
     }
   };
 
-  const handleGenerateQuote = () => {
-    if (productList.length === 0 || isLoading) return;
-    dispatch(generateMultipleQuote({ products: productList, sessionId }));
-  };
-
   const handleDownloadPdf = () => {
     if (pdfUrl) {
       const downloadUrl = `${API_BASE_URL}${pdfUrl}`;
@@ -147,7 +123,7 @@ export function IaComponent() {
   );
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-white relative rounded-lg border border-slate-200">
+    <div className="flex h-full w-full overflow-hidden bg-background relative rounded-lg">
       {/* Modal de Voz */}
       <VoiceModal
         isOpen={isListening}
@@ -159,24 +135,26 @@ export function IaComponent() {
       />
 
       {/* ================= ESQUERDA: ÁREA DO CHAT ================= */}
-      <div className="flex-1 flex flex-col h-full relative min-w-0 bg-[#F9F9F9]">
-        {!isSidebarOpen && mode === "multiple" && (
+      <div className="flex-1 flex flex-col h-full relative min-w-0 bg-background">
+        <ModeSelectionComponent
+          isListening={isListening}
+          isLoading={isLoading}
+        />
+        {!isSidebarOpen && (
           <div className="absolute top-4 right-4 z-50">
             <Button
               variant="outline"
               size="icon"
               onClick={() => setIsSidebarOpen(true)}
-              className="h-12 w-12 rounded-xl border-slate-200 shadow-lg bg-white hover:bg-slate-50 transition-all duration-300 group"
+              className="h-12 w-12 rounded-xl border-slate-200 shadow-lg bg-background hover:bg-muted/80 transition-all duration-300 group hover:cursor-pointer"
             >
-              <ItemsList className="h-6 w-6 text-slate-600 group-hover:text-slate-900" />
+              <ItemsList className="h-6 w-6 text-foreground group-hover:cursor-pointer" />
 
               {/* Badge Verde com contador */}
               <span
                 className={cn(
-                  "absolute -top-2 -right-2 text-white text-xs font-bold h-6 w-6 flex items-center justify-center rounded-full border-2 border-white shadow-sm transition-transform duration-200",
-                  productList.length > 0
-                    ? "bg-green-500 scale-100"
-                    : "bg-slate-400 scale-90"
+                  "absolute -top-2 -right-2 text-foreground text-xs font-bold h-6 w-6 flex items-center justify-center rounded-full shadow-sm transition-transform duration-200",
+                  "bg-sidebar scale-90"
                 )}
               >
                 {productList.length}
@@ -185,7 +163,7 @@ export function IaComponent() {
           </div>
         )}
         {/* Lista de Mensagens */}
-        <div className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar relative z-0 bg-white">
+        <div className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar relative z-0">
           {/* Container Centralizado para as mensagens */}
           <div className="w-full max-w-5xl mx-auto h-full flex flex-col p-4">
             {messages.length === 0 ? (
@@ -253,22 +231,9 @@ export function IaComponent() {
           </div>
         </div>
         {/* Área de Input - Fixa na parte inferior e centralizada */}
-        <div className="p-4 bg-white border-t border-slate-100 w-full z-10">
+        <div className="p-4 w-full z-10">
           <div className="max-w-5xl mx-auto flex flex-col gap-4">
-            <div className="relative flex items-end gap-2 w-full p-2 rounded-2xl border border-slate-300 bg-white focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-400 transition-all shadow-sm">
-              <Button
-                onClick={startListening}
-                disabled={isLoading || isListening}
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "mb-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full cursor-pointer",
-                  isListening && "text-red-500 animate-pulse bg-red-50"
-                )}
-              >
-                <Mic className="h-5 w-5" />
-              </Button>
-
+            <div className="relative flex items-end gap-2 w-full p-2 rounded-2xl border border-foreground focus-within:ring-2 focus-within:ring-foreground focus-within:border-transparent transition-all shadow-sm">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -284,6 +249,19 @@ export function IaComponent() {
               />
 
               <Button
+                onClick={startListening}
+                disabled={isLoading || isListening}
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "mb-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full cursor-pointer",
+                  isListening && "text-red-500 animate-pulse bg-red-50"
+                )}
+              >
+                <Mic className="h-5 w-5" />
+              </Button>
+
+              <Button
                 onClick={() => handleSend(input)}
                 disabled={!input.trim() || isLoading || isListening}
                 size="icon"
@@ -293,11 +271,6 @@ export function IaComponent() {
               </Button>
             </div>
 
-            <ModeSelectionComponent
-              isListening={isListening}
-              isLoading={isLoading}
-            />
-
             {(voiceError || (error && !voiceError)) && (
               <p className="text-xs text-red-500 text-center animate-pulse">
                 {voiceError ? `Erro de Voz: ${voiceError}` : `Erro: ${error}`}
@@ -306,156 +279,21 @@ export function IaComponent() {
           </div>
         </div>
       </div>
-
-      {/* ================= DIREITA: SIDEBAR DESLIZANTE ================= */}
       <div
         className={cn(
-          "bg-white border-l border-slate-200 transition-all duration-300 ease-in-out flex flex-col h-full shadow-2xl z-40 absolute right-0 md:relative",
+          "mt-[1.2%] bg-background border border-slate-200 transition-all duration-300 ease-in-out flex flex-col h-[95%]  rounded-lg z-40 absolute right-0 md:relative mr-4 overflow-hidden",
           isSidebarOpen
             ? "w-full md:w-96 translate-x-0 opacity-100"
             : "w-0 translate-x-full opacity-0 md:translate-x-0 md:w-0"
         )}
       >
-        {/* Header da Sidebar */}
-        <div className="p-4 bg-white border-b border-slate-200 flex justify-between items-center shadow-sm min-w-[384px]">
-          <div className="flex items-center gap-3">
-            <div className="bg-green-100 p-2 rounded-lg">
-              <ShoppingBag className="h-5 w-5 text-green-700" />
-            </div>
-            <div>
-              <h2 className="font-bold text-slate-800 text-sm">
-                Lista de Itens
-              </h2>
-              <p className="text-xs text-slate-500">Resumo do orçamento</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-full border border-slate-200">
-              {productList.length}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 hover:bg-slate-100 rounded-full text-slate-500 cursor-pointer"
-              onClick={() => setIsSidebarOpen(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Conteúdo da Lista */}
-        <div className="flex-1 overflow-hidden flex flex-col bg-white min-w-[384px]">
-          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 px-4 py-2 bg-slate-50 border-b border-slate-100 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-            <span>Produto</span>
-            <span className="text-center w-10">Qtd</span>
-            <span className="text-right w-20">Total</span>
-            <span className="w-8"></span>
-          </div>
-
-          <ScrollArea className="flex-1">
-            {productList.length === 0 ? (
-              <div className="h-64 flex flex-col items-center justify-center text-slate-400 gap-3 px-8 text-center mt-10">
-                <div className="bg-slate-50 p-4 rounded-full mb-2">
-                  <List className="h-8 w-8 opacity-30" />
-                </div>
-                <p className="text-sm font-medium">Sua lista está vazia.</p>
-                <p className="text-xs opacity-70 max-w-[200px]">
-                  Descreva o projeto no chat para a IA identificar os itens
-                  necessários.
-                </p>
-              </div>
-            ) : (
-              <div className="divide-y divide-slate-100">
-                {productList.map((product, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-[1fr_auto_auto_auto] gap-2 p-3 items-center hover:bg-slate-50 transition-colors group"
-                  >
-                    <div className="flex flex-col min-w-0 pr-2">
-                      <span
-                        className="font-medium text-sm text-slate-700 truncate"
-                        title={product.name}
-                      >
-                        {product.name}
-                      </span>
-                      {product.dimensions && (
-                        <span className="text-[10px] text-slate-400 truncate mt-0.5">
-                          {product.dimensions}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex justify-center w-10">
-                      <span className="text-xs font-medium bg-white border border-slate-200 text-slate-700 px-2 py-0.5 rounded shadow-sm">
-                        {product.quantity}
-                      </span>
-                    </div>
-
-                    <div className="text-sm font-semibold text-slate-700 text-right w-20">
-                      {formatCurrencyBRL(product.price * product.quantity)}
-                    </div>
-
-                    <div className="flex justify-end w-8">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => dispatch(removeProduct(index))}
-                        disabled={isLoading}
-                        className="h-7 w-7 text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-        </div>
-
-        {/* Footer da Sidebar */}
-        <div className="p-4 bg-slate-50 border-t border-slate-200 space-y-4 min-w-[384px]">
-          <div className="flex justify-between items-end">
-            <span className="text-sm text-slate-500 font-medium mb-1">
-              Valor Estimado:
-            </span>
-            <span className="text-2xl font-bold text-slate-800 tracking-tight">
-              {formatCurrencyBRL(totalValue)}
-            </span>
-          </div>
-
-          <div className="space-y-2">
-            <Button
-              onClick={handleGenerateQuote}
-              disabled={productList.length === 0 || isLoading}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold shadow-md h-11 rounded-lg transition-all cursor-pointer"
-            >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                  Processando...
-                </div>
-              ) : (
-                <div className="flex items-center">
-                  <Calculator className="mr-2 h-4 w-4" /> Gerar Orçamento
-                </div>
-              )}
-            </Button>
-
-            {productList.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => dispatch(clearProductList())}
-                disabled={isLoading}
-                className="w-full text-xs text-red-400 hover:text-red-600 hover:bg-red-50 h-8 cursor-pointer"
-              >
-                Limpar todos os itens
-              </Button>
-            )}
-          </div>
-        </div>
+        <Aside
+          isLoading={isLoading}
+          productList={productList}
+          sessionId={sessionId}
+          setIsSidebarOpen={setIsSidebarOpen}
+          totalValue={totalValue}
+        />
       </div>
     </div>
   );

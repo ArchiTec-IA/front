@@ -22,45 +22,48 @@ export function ModeSelectionComponent({
     dispatch(setMode(newMode));
   };
   return (
-    <div className="p-4 mb-2 border border-gray-300 rounded-lg flex justify-center gap-4 h-[30%] dark:bg-gray-800">
-      <h2 className="text-lg font-normal">Modo:</h2>
+    <div className="w-50 ml-5 mt-5 rounded-full flex justify-center gap-4 bg-sidebar">
       <Button
         onClick={() => handleSetMode("single")}
-        variant={mode === "single" ? "default" : "outline"}
+        variant={mode === "single" ? "outline" : null}
         className={cn(
-          mode === "single" ? "text-black " : "text-gray-400",
-          "flex flex-col items-center gap-2 h-[100%] w-[35%] text-lg hover:cursor-pointer bg-transparent hover:bg-gray-200 border-none"
+          mode === "single"
+            ? "text-foreground rounded-full w-[30%]"
+            : "text-foreground w-[61.5%]  hover:cursor-pointer"
         )}
         disabled={isLoading || isListening}
       >
-        Orçamento Único
-        <Unique
-          className={cn(
-            "!h-20 !w-20",
-            mode === "single" ? "text-black" : "text-gray-400"
-          )}
-        />
-        <span className="text-sm text-gray-500">(Único ambiente ou item)</span>
+        {mode === "single" ? (
+          <Unique
+            className={cn(
+              "!h-5 !w-5",
+              mode === "single" ? "text-foreground" : "text-foreground"
+            )}
+          />
+        ) : (
+          <span>Detalhado</span>
+        )}
       </Button>
       <Button
         onClick={() => handleSetMode("multiple")}
-        variant={mode === "multiple" ? "default" : "outline"}
+        variant={mode === "multiple" ? "outline" : null}
         className={cn(
-          mode === "multiple" ? "text-black " : "text-gray-400",
-          "flex flex-col items-center gap-2 h-[100%] w-[35%] text-lg hover:cursor-pointer bg-transparent hover:bg-gray-200 border-none"
+          mode === "multiple"
+            ? "text-foreground rounded-full w-[30%]"
+            : "text-foreground  w-[61.5%] hover:cursor-pointer"
         )}
         disabled={isLoading || isListening}
       >
-        Múltiplos Itens
-        <Multiple
-          className={cn(
-            "!h-20 !w-20",
-            mode === "multiple" ? "text-black" : "text-gray-400"
-          )}
-        />
-        <span className="text-sm text-gray-500">
-          (Vários ambientes ou itens)
-        </span>
+        {mode === "multiple" ? (
+          <Multiple
+            className={cn(
+              "!h-5 !w-5",
+              mode === "multiple" ? "text-foreground" : "text-foreground"
+            )}
+          />
+        ) : (
+          <span>Unico</span>
+        )}
       </Button>
     </div>
   );
