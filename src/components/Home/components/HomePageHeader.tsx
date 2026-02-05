@@ -1,3 +1,4 @@
+import { NewProjectModal } from "@/components/New-project-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -25,9 +26,7 @@ export function HomeHeader({ className }: HeaderProps) {
             <Search className="h-4 w-4" />
           </Button>
         </div>
-        <Button className="bg-blue-300 text-black font-bold">
-          + Novo Projeto
-        </Button>
+        <NewProjectModal />
       </div>
     </div>
   );

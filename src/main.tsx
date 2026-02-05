@@ -6,14 +6,17 @@ import App from "./App.tsx";
 import { Toaster } from "sonner";
 import { store } from "./store/index.ts";
 import { Provider } from "react-redux";
+import { ThemeProvider } from "./providers/theme-provider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-        <Toaster />
-      </BrowserRouter>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <BrowserRouter>
+          <App />
+          <Toaster />
+        </BrowserRouter>
+      </ThemeProvider>
     </Provider>
   </StrictMode>
 );

@@ -1,6 +1,12 @@
 "use client";
 
-import { AudioWaveform, Command, GalleryVerticalEnd } from "lucide-react";
+import {
+  AudioWaveform,
+  Command,
+  GalleryVerticalEnd,
+  Moon,
+  Sun,
+} from "lucide-react";
 import * as React from "react";
 
 import { AiFileIcon, FoldersIcon, HomeIcon } from "@/assets/icons";
@@ -17,6 +23,8 @@ import { NavProjects } from "./nav-projects";
 import { NavUser } from "./nav-user";
 import { SideBarHeader } from "./side-bar-header";
 import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { useTheme } from "@/providers/theme-provider";
 
 const data = {
   teams: [
@@ -58,9 +66,14 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open } = useSidebar();
+  const { setTheme, theme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props} className="bg-red-600">
       <SidebarHeader>
         <div
           className={cn(
@@ -78,6 +91,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
+        <div className="w-full flex items-center justify-center">
+          <Button
+            variant={"ghost"}
+            size="icon"
+            className="hover:cursor-pointer dark:hover:bg-transparent flex items-center justify-center bg-transparent rounded-sm p-2"
+            onClick={toggleTheme}
+          >
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5 text-gray-500 dark:text-white" />
+            ) : (
+              <Moon className="h-5 w-5 text-gray-500" />
+            )}
+          </Button>
+        </div>
+
         <NavUser isOpen={open} />
       </SidebarFooter>
     </Sidebar>

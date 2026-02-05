@@ -22,7 +22,7 @@ export function NavUser({ isOpen }: NavItensProps) {
   };
   return (
     <SidebarMenu>
-      <SidebarMenuItem className="flex items-center bg-white p-3 rounded-lg  min-w-[50px]">
+      <SidebarMenuItem className="flex items-center bg-background p-3 rounded-lg  min-w-[50px]">
         {isOpen && (
           <>
             <Avatar className="h-10 w-10 flex items-center justify-center border-slate-300 border">

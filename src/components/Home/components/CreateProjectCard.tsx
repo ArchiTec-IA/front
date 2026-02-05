@@ -11,7 +11,7 @@ export function CreateCardComponent({ className }: CreateCardProps) {
     <Card
       className={cn(
         className,
-        "max-w-60 min-w-60 h-60 bg-slate-100 flex justify-center items-center p-0 overflow-hidden hover:cursor-pointer border-2 border-slate-200 border-dashed"
+        "max-w-60 min-w-60 h-60 bg-accent flex justify-center items-center p-0 overflow-hidden hover:cursor-pointer border-2 border-slate-200 border-dashed"
       )}
       onClick={() => console.log("Abrir Prajeira: ")}
     >

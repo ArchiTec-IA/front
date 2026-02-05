@@ -18,14 +18,14 @@ export function CardItem({
     <Card
       className={cn(
         className,
-        "max-w-60 min-w-60 h-60 bg-slate-100 flex justify-end p-0 overflow-hidden hover:cursor-pointer"
+        "max-w-60 min-w-60 h-60 bg-muted-foreground flex justify-end p-0 overflow-hidden hover:cursor-pointer border-none"
       )}
-      onClick={() => console.log("Abrir Prajeira: ", id)}
+      onClick={() => console.log("Abrir Prajeissssra: ", id)}
     >
-      <CardFooter className="flex flex-col items-center justify-center h-22 bg-white p-0">
+      <CardFooter className="flex flex-col items-center justify-center h-22 bg-muted p-0">
         <CardTitle className="text-base font-bold">{title}</CardTitle>
         <CardContent>
-          <p className="text-gray-600 text-sm">{description}</p>
+          <p className="text-fore-ground text-sm">{description}</p>
         </CardContent>
       </CardFooter>
     </Card>
