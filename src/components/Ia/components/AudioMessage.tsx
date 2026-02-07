@@ -39,8 +39,8 @@ export default function AudioMessage({ src }: { src: string }) {
         const audioContext = new AudioContext();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-        const rawData = audioBuffer.getChannelData(0); // Dados binários do som
-        const samples = 50; // Quantidade de barrinhas (ajuste para densidade)
+        const rawData = audioBuffer.getChannelData(0);
+        const samples = 50;
         const blockSize = Math.floor(rawData.length / samples);
         const filteredData = [];
 
@@ -53,7 +53,6 @@ export default function AudioMessage({ src }: { src: string }) {
           filteredData.push(sum / blockSize);
         }
 
-        // Normaliza para que os picos preencham a altura total (0 a 100%)
         const multiplier = Math.pow(Math.max(...filteredData), -1);
         const normalizedData = filteredData.map((n) => n * multiplier * 100);
 
@@ -90,12 +89,10 @@ export default function AudioMessage({ src }: { src: string }) {
                 key={i}
                 className={cn(
                   "w-[5px] min-w-[1px] rounded-full transition-all duration-500",
-                  isPlayed
-                    ? "bg-primary" // Cor do áudio que já tocou (estilo WhatsApp)
-                    : "bg-muted-foreground", // Cor do áudio que ainda não tocou
+                  isPlayed ? "bg-primary" : "bg-muted-foreground",
                 )}
                 style={{
-                  height: `${Math.max(height, 8)}%`, // Altura mínima de 8% para silêncio
+                  height: `${Math.max(height, 8)}%`,
                 }}
               />
             );

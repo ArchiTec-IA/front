@@ -28,8 +28,8 @@ export function ModeSelectionComponent({
         variant={mode === "single" ? "outline" : null}
         className={cn(
           mode === "single"
-            ? "text-foreground rounded-full w-[30%]"
-            : "text-foreground w-[61.5%]  hover:cursor-pointer"
+            ? "text-accent-foreground rounded-full w-[30%]"
+            : "text-accent-foreground w-[61.5%]  hover:cursor-pointer",
         )}
         disabled={isLoading || isListening}
       >
@@ -37,11 +37,13 @@ export function ModeSelectionComponent({
           <Unique
             className={cn(
               "!h-5 !w-5",
-              mode === "single" ? "text-foreground" : "text-foreground"
+              mode === "single"
+                ? "text-accent-foreground"
+                : "text-accent-foreground",
             )}
           />
         ) : (
-          <span>Detalhado</span>
+          <span className="text-accent-foreground">Detalhado</span>
         )}
       </Button>
       <Button
@@ -49,8 +51,8 @@ export function ModeSelectionComponent({
         variant={mode === "multiple" ? "outline" : null}
         className={cn(
           mode === "multiple"
-            ? "text-foreground rounded-full w-[30%]"
-            : "text-foreground  w-[61.5%] hover:cursor-pointer"
+            ? "text-accent-foreground rounded-full w-[30%]"
+            : "text-accent-foreground  w-[61.5%] hover:cursor-pointer",
         )}
         disabled={isLoading || isListening}
       >
@@ -58,11 +60,13 @@ export function ModeSelectionComponent({
           <Multiple
             className={cn(
               "!h-5 !w-5",
-              mode === "multiple" ? "text-foreground" : "text-foreground"
+              mode === "multiple"
+                ? "text-accent-foreground"
+                : "text-accent-foreground",
             )}
           />
         ) : (
-          <span>Unico</span>
+          <span className="text-accent-foreground">Unico</span>
         )}
       </Button>
     </div>

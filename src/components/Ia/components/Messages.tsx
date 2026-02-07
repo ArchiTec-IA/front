@@ -112,7 +112,7 @@ export function MessagesComponent(props: MessagesComponentsProps) {
               <div
                 className={`rounded-lg p-4 ${
                   message.sender === "user"
-                    ? "bg-chat text-chat-foreground"
+                    ? "bg-chat text-foreground"
                     : "bg-chat-foreground text-sidebar"
                 } ${message.type === "audio" ? "bg-transparent" : ""} `}
               >

@@ -8,10 +8,12 @@ export interface Project {
 
 interface ProjectState {
   projects: Project[];
+  isOpenModal: boolean;
 }
 
 const initialState: ProjectState = {
   projects: [],
+  isOpenModal: false,
 };
 
 export const projectSlice = createSlice({
@@ -24,8 +26,11 @@ export const projectSlice = createSlice({
     setProjects: (state, action: PayloadAction<Project[]>) => {
       state.projects = action.payload;
     },
+    setIsOpenModal: (state, action: PayloadAction<boolean>) => {
+      state.isOpenModal = action.payload;
+    },
   },
 });
 
-export const { addProject, setProjects } = projectSlice.actions;
+export const { addProject, setProjects, setIsOpenModal } = projectSlice.actions;
 export default projectSlice.reducer;

@@ -67,12 +67,12 @@ export const sendSingleChat = createAsyncThunk<
     if (!response.ok) {
       const errorData = await response.json();
       return rejectWithValue(
-        errorData.error || "Falha ao processar a mensagem no modo único."
+        errorData.error || "Falha ao processar a mensagem no modo único.",
       );
     }
 
     return response.json();
-  }
+  },
 );
 
 export const extractProducts = createAsyncThunk<
@@ -91,13 +91,13 @@ export const extractProducts = createAsyncThunk<
     if (!response.ok) {
       const errorData = await response.json();
       return rejectWithValue(
-        errorData.error || "Falha ao extrair produtos da mensagem."
+        errorData.error || "Falha ao extrair produtos da mensagem.",
       );
     }
 
     const data: ExtractProductsResponse = await response.json();
     return data.products;
-  }
+  },
 );
 
 export const generateMultipleQuote = createAsyncThunk<
@@ -123,12 +123,12 @@ export const generateMultipleQuote = createAsyncThunk<
     if (!response.ok) {
       const errorData = await response.json();
       return rejectWithValue(
-        errorData.error || "Falha ao gerar o orçamento final."
+        errorData.error || "Falha ao gerar o orçamento final.",
       );
     }
 
     return response.json();
-  }
+  },
 );
 
 const initialState: ChatState = {
@@ -147,11 +147,11 @@ const chatSlice = createSlice({
   reducers: {
     setMode: (state, action: PayloadAction<ChatMode>) => {
       state.mode = action.payload;
-      state.pdfUrl = null;
-      state.productList = [];
-      state.sessionId = generateSessionId();
+      // state.pdfUrl = null;
+      // state.productList = [];
+      // state.sessionId = generateSessionId();
 
-      state.messages = [];
+      // state.messages = [];
       state.error = null;
     },
     addMessage: (
@@ -160,7 +160,7 @@ const chatSlice = createSlice({
         content: string;
         sender: "user" | "bot";
         type: "text" | "audio";
-      }>
+      }>,
     ) => {
       state.messages.push({
         id: generateSessionId(),
@@ -204,7 +204,7 @@ const chatSlice = createSlice({
             type: "text",
           });
           state.pdfUrl = action.payload.pdf_url;
-        }
+        },
       )
       .addCase(sendSingleChat.rejected, (state, action) => {
         state.status = "failed";
@@ -233,7 +233,7 @@ const chatSlice = createSlice({
 
           newProducts.forEach((newP) => {
             const existingIndex = state.productList.findIndex(
-              (p) => p.name.toLowerCase() === newP.name.toLowerCase()
+              (p) => p.name.toLowerCase() === newP.name.toLowerCase(),
             );
 
             if (existingIndex !== -1) {
@@ -260,7 +260,7 @@ const chatSlice = createSlice({
               type: "text",
             });
           }
-        }
+        },
       )
       .addCase(extractProducts.rejected, (state, action) => {
         state.status = "failed";
@@ -294,7 +294,7 @@ const chatSlice = createSlice({
           });
           state.pdfUrl = action.payload.pdf_url;
           state.productList = [];
-        }
+        },
       )
       .addCase(generateMultipleQuote.rejected, (state, action) => {
         state.status = "failed";

@@ -8,7 +8,7 @@ interface CompanyHeaderProps {
 
 const CompanyLogo = () => (
   <div className="w-10 h-10 bg-background rounded-lg flex items-center justify-center flex-shrink-0">
-    <QuioLogo className="w-6 h-6 text-foreground" />
+    <QuioLogo className="w-6 h-6 text-accsent-foreground" />
   </div>
 );
 

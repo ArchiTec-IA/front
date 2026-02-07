@@ -11,7 +11,10 @@ type HeaderProps = {
 export function HomeHeader({ className }: HeaderProps) {
   return (
     <div
-      className={cn("w-full flex justify-between items-center px-3", className)}
+      className={cn(
+        "w-full flex justify-between items-center px-3 bg-transparent",
+        className,
+      )}
     >
       <h1 className="text-2xl w-[60%]">Meus Projetos</h1>
       <div className="flex items-center flex-1 gap-2">

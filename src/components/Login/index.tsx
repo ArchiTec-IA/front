@@ -37,7 +37,7 @@ export function LoginPageComponent({
             email: email as string,
           },
           isAuthenticated: true,
-        })
+        }),
       );
       navigate("/splash", { replace: true });
     } else {
@@ -48,7 +48,7 @@ export function LoginPageComponent({
     <div
       className={cn(
         "flex w-full items-center justify-center h-[100dvh] bg-[#1E1E1E]",
-        className
+        className,
       )}
       {...props}
     >
@@ -57,7 +57,7 @@ export function LoginPageComponent({
         <Solutions width={200} height={22} className="text-white" />
       </div>
       <div className="w-[50%] h-full flex items-center justify-center">
-        <Card className="w-[60%] h-[60%] flex flex-col justify-center bg-white/15 border-none">
+        <Card className="w-[60%] h-[70%] flex flex-col justify-center bg-white/15 border-none">
           <CardHeader className="">
             <div className="flex flex-col items-center">
               <CardTitle className="text-4xl text-white">

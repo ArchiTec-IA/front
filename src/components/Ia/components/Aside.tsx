@@ -34,18 +34,19 @@ export default function Aside({
 
   return (
     <>
-      {/* Header da Sidebar */}
       <div className="p-4 bg-background border-b flex justify-between items-center shadow-sm min-w-[334px]">
         <div className="flex items-center gap-3">
           <div>
-            <h2 className="font-bold text-foreground text-sm">
+            <h2 className="font-bold text-accent-foreground text-sm">
               Lista de Itens
             </h2>
-            <p className="text-xs text-foreground">Resumo do orçamento</p>
+            <p className="text-xs text-accent-foreground">
+              Resumo do orçamento
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full border border-slate-200">
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full border border-slate-200 text-accent-foreground">
             {productList.length}
           </span>
           <Button
@@ -61,7 +62,7 @@ export default function Aside({
 
       {/* Conteúdo da Lista */}
       <div className="flex-1 overflow-hidden flex flex-col bg-background min-w-[384px]">
-        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 px-4 py-2 bg-background border-b border-slate-100 text-[11px] font-semibold text-foreground uppercase tracking-wider">
+        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 px-4 py-2 bg-background border-b border-slate-100 text-[11px] font-semibold text-accent-foreground uppercase tracking-wider">
           <span>Produto</span>
           <span className="text-center w-10">Qtd</span>
           <span className="text-right w-20">Total</span>
@@ -70,14 +71,14 @@ export default function Aside({
 
         <ScrollArea className="flex-1">
           {productList.length === 0 ? (
-            <div className="h-64 flex flex-col items-center justify-center text-slate-400 gap-3 px-8 text-center mt-10">
+            <div className="h-64 flex flex-col items-center justify-center text-accent-foreground gap-3 px-8 text-center mt-10">
               <div className="bg-muted p-4 rounded-full mb-2">
                 <List className="h-8 w-8 opacity-80" />
               </div>
-              <p className="text-sm  text-foreground font-medium">
+              <p className="text-sm  text-accent-foreground font-medium">
                 Sua lista está vazia.
               </p>
-              <p className="text-xs text-foreground max-w-[200px]">
+              <p className="text-xs text-accent-foreground max-w-[200px]">
                 Descreva o projeto no chat para a IA identificar os itens
                 necessários.
               </p>
@@ -91,25 +92,25 @@ export default function Aside({
                 >
                   <div className="flex flex-col min-w-0 pr-2">
                     <span
-                      className="font-medium text-sm text-slate-700 truncate"
+                      className="font-medium text-sm text-accent-foreground truncate"
                       title={product.name}
                     >
                       {product.name}
                     </span>
                     {product.dimensions && (
-                      <span className="text-[10px] text-slate-400 truncate mt-0.5">
+                      <span className="text-[10px] text-accent-foreground truncate mt-0.5">
                         {product.dimensions}
                       </span>
                     )}
                   </div>
 
                   <div className="flex justify-center w-10">
-                    <span className="text-xs font-medium bg-white border border-slate-200 text-slate-700 px-2 py-0.5 rounded shadow-sm">
+                    <span className="text-xs font-medium bg-white border border-slate-200 text-accent-foreground px-2 py-0.5 rounded shadow-sm">
                       {product.quantity}
                     </span>
                   </div>
 
-                  <div className="text-sm font-semibold text-foreground text-right w-20">
+                  <div className="text-sm font-semibold text-accent-foreground text-right w-20">
                     {formatCurrencyBRL(product.price * product.quantity)}
                   </div>
 
@@ -131,13 +132,12 @@ export default function Aside({
         </ScrollArea>
       </div>
 
-      {/* Footer da Sidebar */}
       <div className="p-4 bg-background border-t border-slate-200 space-y-4 min-w-[384px]">
         <div className="flex justify-between items-end">
-          <span className="text-sm text-foreground font-medium mb-1">
+          <span className="text-sm text-accent-foreground font-medium mb-1">
             Valor Estimado:
           </span>
-          <span className="text-2xl font-bold text-foreground tracking-tight">
+          <span className="text-2xl font-bold text-accent-foreground tracking-tight">
             {formatCurrencyBRL(totalValue)}
           </span>
         </div>
@@ -146,7 +146,7 @@ export default function Aside({
           <Button
             onClick={handleGenerateQuote}
             disabled={productList.length === 0 || isLoading}
-            className="w-full bg-sidebar hover:bg-green-700 text-foreground font-bold shadow-md h-11 rounded-lg transition-all cursor-pointer"
+            className="w-full bg-sidebar-primary hover:bg-green-700 text-foreground font-bold shadow-md h-11 rounded-lg transition-all cursor-pointer"
           >
             {isLoading ? (
               <div className="flex items-center">

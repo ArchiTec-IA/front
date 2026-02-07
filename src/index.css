@@ -98,7 +98,7 @@
   :root {
     --radius: 0.625rem;
     --background: oklch(1 0 0);
-    --foreground: oklch(0.129 0.042 264.695);
+    --foreground: oklch(1 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.129 0.042 264.695);
     --popover: oklch(1 0 0);
@@ -130,7 +130,7 @@
     --sidebar-ring: oklch(0.704 0.04 256.788);
 
     --chat: oklch(0.5251 0.0605 230.67);
-    --chat-foreground: oklch(0.9323 0.0161 99);
+    --chat-foreground: oklch(23.47% 0 0);
     --gold-wood: oklch(0.6549 0.0564 43.59);
   }
 
@@ -180,7 +180,7 @@
     --sidebar-foreground: oklch(100% 0 0);
     --sidebar-primary: oklch(0% 0 0);
     --sidebar-primary-foreground: oklch(23.47% 0 0);
-    --sidebar-accent: oklch(27.41% 0 0);
+    --sidebar-accent: oklch(100% 0 0);
     --sidebar-accent-foreground: oklch(100% 0 0);
     --sidebar-border: oklch(25% 0 0);
     --sidebar-ring: oklch(90.1% 0 0);
