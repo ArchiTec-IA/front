@@ -42,7 +42,8 @@ export function IaComponent() {
     }
   }, [mode, isSidebarOpen]);
 
-  const startRecording = async () => {
+  const startRecording = async (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
@@ -52,15 +53,15 @@ export function IaComponent() {
       recorder.onstop = () => {
         const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
         const audioUrl = URL.createObjectURL(audioBlob);
-        handleSend(audioUrl, true); // Envia o áudio ao soltar o botão
-        stream.getTracks().forEach((track) => track.stop());
+        handleSend(audioUrl, true);
+        stream.getTracks().forEach((t) => t.stop());
       };
 
       recorder.start();
       mediaRecorderRef.current = recorder;
       setIsRecording(true);
     } catch (err) {
-      console.error("Erro ao acessar microfone", err);
+      console.error("Erro ao gravar", err);
     }
   };
 
@@ -91,14 +92,14 @@ export function IaComponent() {
         content: userMessageContent,
         sender: "user",
         type: isAudio ? "audio" : "text",
-      })
+      }),
     );
 
     if (mode === "multiple") {
       dispatch(extractProducts({ message: userMessageContent, sessionId }));
     } else {
       dispatch(
-        sendSingleChat({ message: userMessageContent, sessionId, mode })
+        sendSingleChat({ message: userMessageContent, sessionId, mode }),
       );
     }
   };
@@ -141,7 +142,7 @@ export function IaComponent() {
 
   const totalValue = productList.reduce(
     (sum, item) => sum + item.price * item.quantity,
-    0
+    0,
   );
 
   return (
@@ -163,7 +164,7 @@ export function IaComponent() {
               <span
                 className={cn(
                   "absolute -top-2 -right-2 text-foreground text-xs font-bold h-6 w-6 flex items-center justify-center rounded-full shadow-sm transition-transform duration-200",
-                  "bg-sidebar scale-90"
+                  "bg-sidebar scale-90",
                 )}
               >
                 {productList.length}
@@ -261,18 +262,18 @@ export function IaComponent() {
                 onMouseDown={startRecording}
                 onMouseUp={stopRecording}
                 onMouseLeave={stopRecording}
-                onTouchStart={startRecording} // Suporte mobile
+                onTouchStart={startRecording}
                 onTouchEnd={stopRecording}
                 disabled={isLoading}
                 variant="ghost"
                 size="icon"
                 className={cn(
                   "mb-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full cursor-pointer",
-                  isRecording && "text-red-500 animate-pulse bg-red-50"
+                  isRecording && "text-blue-500 animate-pulse",
                 )}
               >
                 {isRecording && (
-                  <span className="absolute inset-0 rounded-full animate-ping bg-red-500/30" />
+                  <span className="absolute inset-0 rounded-full animate-ping bg-blue-500/30" />
                 )}
                 <Mic className="h-5 w-5" />
               </Button>
@@ -294,7 +295,7 @@ export function IaComponent() {
           "mt-[1.2%] bg-background border border-slate-200 transition-all duration-300 ease-in-out flex flex-col h-[95%]  rounded-lg z-40 absolute right-0 md:relative mr-4 overflow-hidden",
           isSidebarOpen
             ? "w-full md:w-96 translate-x-0 opacity-100"
-            : "w-0 translate-x-full opacity-0 md:translate-x-0 md:w-0"
+            : "w-0 translate-x-full opacity-0 md:translate-x-0 md:w-0",
         )}
       >
         <Aside

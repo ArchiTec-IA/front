@@ -13,3 +13,5 @@ export { Quio } from "./Quio";
 export { Solutions } from "./Solutions";
 export { ItemsList } from "./ItemsList";
 export { QuioLogo } from "./QuioLogo";
+export { QuioIcon } from "./QuioIcon";
+export { UserIcon } from "./UserIcon";

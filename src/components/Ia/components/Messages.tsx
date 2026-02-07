@@ -1,9 +1,9 @@
+import { QuioIcon, UserIcon } from "@/assets/icons";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/hooks/hooks";
-import { getInitials } from "@/lib/utils";
-import { CheckCheck, Copy } from "lucide-react";
 import type { Message } from "@/store/chatSlice";
+import { CheckCheck, Copy } from "lucide-react";
 import AudioMessage from "./AudioMessage";
 
 type MessagesComponentsProps = {
@@ -78,38 +78,43 @@ export function MessagesComponent(props: MessagesComponentsProps) {
           <div
             key={message.id}
             className={`flex gap-4 ${
-              // Ajustar de role para sender
               message.sender === "user" ? "flex-row-reverse" : "flex-row"
             }`}
           >
             <Avatar
               className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                message.sender === "user" ? "bg-green-300" : "bg-blue-300"
+                message.sender === "user"
+                  ? "bg-chat-foreground"
+                  : "bg-chat-foreground"
               }`}
             >
-              <AvatarFallback className="text-slate-600 font-bold mt-1 bg-transparent h-full w-full flex items-center justify-center">
-                {message.sender === "user" ? getInitials(user?.name) : "AI"}
+              <AvatarFallback className="text-muted font-medium bg-transparent h-full w-full flex items-center justify-center">
+                {message.sender === "user" ? (
+                  <UserIcon width="24" height="24" />
+                ) : (
+                  <QuioIcon width="24" height="24" />
+                )}
               </AvatarFallback>
             </Avatar>
 
-            <div
-              className={`flex-1 space-y-2 ${
-                message.sender === "user" ? "max-w-[80%]" : "max-w-[80%]"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-gray-700">
+            <div className={`flex-1 space-y-2 max-w-[80%]`}>
+              <div
+                className={`flex gap-2 ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <span className={`text-sm font-bold text-chat-foreground`}>
                   {message.sender === "user" ? `${user?.name}` : "QuioAI"}
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className={`text-xs text-muted-foreground`}>
                   {props.formatTime(message.timestamp)}
                 </span>
               </div>
 
               <div
                 className={`rounded-lg p-4 ${
-                  message.sender === "user" ? "bg-background" : "bg-blue-200"
-                }`}
+                  message.sender === "user"
+                    ? "bg-chat text-chat-foreground"
+                    : "bg-chat-foreground text-sidebar"
+                } ${message.type === "audio" ? "bg-transparent" : ""} `}
               >
                 {message.type === "audio" ? (
                   <AudioMessage src={message.content} />
