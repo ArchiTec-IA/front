@@ -18,6 +18,7 @@ export interface Message {
   content: string;
   sender: "user" | "bot";
   timestamp: string;
+  type: "text" | "audio";
 }
 
 interface ChatResponse {
@@ -155,13 +156,18 @@ const chatSlice = createSlice({
     },
     addMessage: (
       state,
-      action: PayloadAction<{ content: string; sender: "user" | "bot" }>
+      action: PayloadAction<{
+        content: string;
+        sender: "user" | "bot";
+        type: "text" | "audio";
+      }>
     ) => {
       state.messages.push({
         id: generateSessionId(),
         content: action.payload.content,
         sender: action.payload.sender,
         timestamp: new Date().toISOString(),
+        type: action.payload.type,
       });
       state.error = null;
     },
@@ -173,6 +179,7 @@ const chatSlice = createSlice({
         content: "Lista de itens limpa.",
         sender: "bot",
         timestamp: new Date().toISOString(),
+        type: "text",
       });
     },
     removeProduct: (state, action: PayloadAction<number>) => {
@@ -194,6 +201,7 @@ const chatSlice = createSlice({
             content: action.payload.response,
             sender: "bot",
             timestamp: new Date().toISOString(),
+            type: "text",
           });
           state.pdfUrl = action.payload.pdf_url;
         }
@@ -207,6 +215,7 @@ const chatSlice = createSlice({
           content: `❌ Erro: ${state.error}`,
           sender: "bot",
           timestamp: new Date().toISOString(),
+          type: "text",
         });
       })
 
@@ -240,6 +249,7 @@ const chatSlice = createSlice({
               content: `✅ ${newProducts.length} item(ns) encontrado(s) e adicionado(s) à lista.`,
               sender: "bot",
               timestamp: new Date().toISOString(),
+              type: "text",
             });
           } else {
             state.messages.push({
@@ -247,6 +257,7 @@ const chatSlice = createSlice({
               content: `❌ Não consegui identificar produtos. Tente ser mais específico.`,
               sender: "bot",
               timestamp: new Date().toISOString(),
+              type: "text",
             });
           }
         }
@@ -262,6 +273,7 @@ const chatSlice = createSlice({
           content: `⚠️ Erro na extração: ${state.error}`,
           sender: "bot",
           timestamp: new Date().toISOString(),
+          type: "text",
         });
       })
 
@@ -278,6 +290,7 @@ const chatSlice = createSlice({
             content: action.payload.response,
             sender: "bot",
             timestamp: new Date().toISOString(),
+            type: "text",
           });
           state.pdfUrl = action.payload.pdf_url;
           state.productList = [];
@@ -294,6 +307,7 @@ const chatSlice = createSlice({
           content: `❌ Erro: ${state.error}`,
           sender: "bot",
           timestamp: new Date().toISOString(),
+          type: "text",
         });
       });
   },

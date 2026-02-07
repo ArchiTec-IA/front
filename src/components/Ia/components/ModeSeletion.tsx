@@ -6,7 +6,7 @@ import { setMode, type ChatMode } from "@/store/chatSlice";
 
 interface ModeSelectionComponentProps {
   isLoading: boolean;
-  isListening: boolean;
+  isListening?: boolean;
 }
 
 export function ModeSelectionComponent({

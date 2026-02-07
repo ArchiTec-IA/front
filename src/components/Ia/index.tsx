@@ -2,27 +2,27 @@ import { ItemsList } from "@/assets/icons";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
-import { useSpeechRecognition } from "@/hooks/use-speech-recongnition";
 import { cn } from "@/lib/utils";
 import { addMessage, extractProducts, sendSingleChat } from "@/store/chatSlice";
 import { Download, Mic, Send } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Aside from "./components/Aside";
 import { MessagesComponent } from "./components/Messages";
 import { ModeSelectionComponent } from "./components/ModeSeletion";
 import { NoContentComponent } from "./components/NoContent";
-import { VoiceModal } from "./components/VoiceModal";
 
 const API_BASE_URL = "api";
 
 export function IaComponent() {
   const dispatch = useAppDispatch();
   const chatState = useAppSelector((state) => state.chat);
-  const { messages, productList, mode, sessionId, status, pdfUrl, error } =
-    chatState;
+  const { messages, productList, mode, sessionId, status, pdfUrl } = chatState;
 
   const [input, setInput] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -42,19 +42,34 @@ export function IaComponent() {
     }
   }, [mode, isSidebarOpen]);
 
-  const handleVoiceResult = useCallback((transcript: string) => {
-    if (transcript.trim()) {
-      setInput(transcript.trim());
-    }
-  }, []);
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      chunksRef.current = [];
 
-  const {
-    isListening,
-    transcript,
-    error: voiceError,
-    startListening,
-    stopListening,
-  } = useSpeechRecognition(handleVoiceResult);
+      recorder.ondataavailable = (e) => chunksRef.current.push(e.data);
+      recorder.onstop = () => {
+        const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        handleSend(audioUrl, true); // Envia o áudio ao soltar o botão
+        stream.getTracks().forEach((track) => track.stop());
+      };
+
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Erro ao acessar microfone", err);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -64,13 +79,20 @@ export function IaComponent() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async (messageToSend = input) => {
-    if (!messageToSend.trim() || isLoading) return;
+  const handleSend = async (messageToSend = input, isAudio = false) => {
+    if ((!isAudio && !messageToSend.trim()) || isLoading) return;
+    if (isAudio && isLoading) return;
 
     const userMessageContent = messageToSend;
-    setInput("");
+    if (!isAudio) setInput("");
 
-    dispatch(addMessage({ content: userMessageContent, sender: "user" }));
+    dispatch(
+      addMessage({
+        content: userMessageContent,
+        sender: "user",
+        type: isAudio ? "audio" : "text",
+      })
+    );
 
     if (mode === "multiple") {
       dispatch(extractProducts({ message: userMessageContent, sessionId }));
@@ -124,22 +146,9 @@ export function IaComponent() {
 
   return (
     <div className="flex h-full w-full overflow-hidden bg-background relative rounded-lg">
-      {/* Modal de Voz */}
-      <VoiceModal
-        isOpen={isListening}
-        onStop={stopListening}
-        message={
-          transcript ? "Transcrição em andamento..." : "Ouvindo... Fale agora."
-        }
-        transcript={transcript}
-      />
-
       {/* ================= ESQUERDA: ÁREA DO CHAT ================= */}
       <div className="flex-1 flex flex-col h-full relative min-w-0 bg-background">
-        <ModeSelectionComponent
-          isListening={isListening}
-          isLoading={isLoading}
-        />
+        <ModeSelectionComponent isLoading={isLoading} />
         {!isSidebarOpen && (
           <div className="absolute top-4 right-4 z-50">
             <Button
@@ -243,39 +252,40 @@ export function IaComponent() {
                     ? "Descreva o produto ou faça uma pergunta..."
                     : "Adicione itens (ex: '3 dobradiças curvas')..."
                 }
-                disabled={isLoading || isListening}
+                disabled={isLoading}
                 className="flex-1 max-h-32 min-h-[44px] py-3 px-2 bg-transparent border-none focus:ring-0 resize-none placeholder:text-slate-400 text-sm scrollbar-hide outline-none"
                 rows={1}
               />
 
               <Button
-                onClick={startListening}
-                disabled={isLoading || isListening}
+                onMouseDown={startRecording}
+                onMouseUp={stopRecording}
+                onMouseLeave={stopRecording}
+                onTouchStart={startRecording} // Suporte mobile
+                onTouchEnd={stopRecording}
+                disabled={isLoading}
                 variant="ghost"
                 size="icon"
                 className={cn(
                   "mb-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full cursor-pointer",
-                  isListening && "text-red-500 animate-pulse bg-red-50"
+                  isRecording && "text-red-500 animate-pulse bg-red-50"
                 )}
               >
+                {isRecording && (
+                  <span className="absolute inset-0 rounded-full animate-ping bg-red-500/30" />
+                )}
                 <Mic className="h-5 w-5" />
               </Button>
 
               <Button
                 onClick={() => handleSend(input)}
-                disabled={!input.trim() || isLoading || isListening}
+                disabled={!input.trim() || isLoading || isRecording}
                 size="icon"
                 className="mb-1 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-sm disabled:opacity-50 cursor-pointer"
               >
                 <Send className="h-4 w-4" />
               </Button>
             </div>
-
-            {(voiceError || (error && !voiceError)) && (
-              <p className="text-xs text-red-500 text-center animate-pulse">
-                {voiceError ? `Erro de Voz: ${voiceError}` : `Erro: ${error}`}
-              </p>
-            )}
           </div>
         </div>
       </div>

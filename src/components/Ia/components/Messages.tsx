@@ -4,6 +4,7 @@ import { useAppSelector } from "@/hooks/hooks";
 import { getInitials } from "@/lib/utils";
 import { CheckCheck, Copy } from "lucide-react";
 import type { Message } from "@/store/chatSlice";
+import AudioMessage from "./AudioMessage";
 
 type MessagesComponentsProps = {
   formatTime: (isoDate: string) => string;
@@ -31,7 +32,7 @@ const formatMessageContent = (text: string) => {
         row
           .split("|")
           .map((cell: string) => cell.trim())
-          .filter((cell: string) => cell)
+          .filter((cell: string) => cell),
       )
       .filter((row: string[]) => row.length > 0);
 
@@ -46,7 +47,7 @@ const formatMessageContent = (text: string) => {
       const isTotalRow = row.some(
         (cell: string) =>
           cell.toLowerCase().includes("total") ||
-          cell.toLowerCase().includes("valor total")
+          cell.toLowerCase().includes("valor total"),
       );
       tableHTML += `<tr class="${
         isTotalRow
@@ -107,11 +108,14 @@ export function MessagesComponent(props: MessagesComponentsProps) {
 
               <div
                 className={`rounded-lg p-4 ${
-                  message.sender === "user" ? "bg-green-200" : "bg-blue-200"
+                  message.sender === "user" ? "bg-background" : "bg-blue-200"
                 }`}
               >
-                {/* Usar a função de formatação */}
-                {formatMessageContent(message.content)}
+                {message.type === "audio" ? (
+                  <AudioMessage src={message.content} />
+                ) : (
+                  formatMessageContent(message.content)
+                )}
               </div>
 
               {message.sender === "bot" && (
