@@ -41,7 +41,7 @@ export interface ChatState {
   error: string | null;
 }
 
-const API_BASE_URL = "api";
+const API_BASE_URL = "http://quio-alb-25446701.us-east-2.elb.amazonaws.com/";
 const generateSessionId = () =>
   "session_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 
