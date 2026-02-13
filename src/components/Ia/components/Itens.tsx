@@ -97,7 +97,7 @@ export function MovelCard({
 // Sub-componente interno para a linha da peça
 function ComponenteRow({
   componente,
-  onEdit,
+  // onEdit,
 }: {
   componente: ComponenteItem;
   onEdit: () => void;
@@ -121,12 +121,12 @@ function ComponenteRow({
         <span className="text-[11px] font-bold text-accent-foreground">
           {formatCurrencyBRL(componente.subtotal)}
         </span>
-        <button
+        {/* <button
           onClick={onEdit}
           className="text-[9px] text-accent-foreground font-bold hover:underline cursor-pointer mt-0.5"
         >
           Editar
-        </button>
+        </button> */}
       </div>
     </div>
   );
