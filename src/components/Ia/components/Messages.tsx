@@ -1,16 +1,20 @@
 import { QuioIcon, UserIcon } from "@/assets/icons";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { useAppSelector } from "@/hooks/hooks";
-import type { Message } from "@/store/chatSlice";
-import { CheckCheck, Copy } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import {
+  selectChatOption,
+  type ChatOption,
+  type Message,
+} from "@/store/chatSlice";
 import AudioMessage from "./AudioMessage";
+import { Button } from "@/components/ui/button";
 
 type MessagesComponentsProps = {
   formatTime: (isoDate: string) => string;
   copyToClipboard: (content: string, messageId: string) => Promise<void>;
   copiedId?: string | null;
   messages?: Message[];
+  handleSend: (message: string) => void;
 };
 
 const formatMessageContent = (text: string) => {
@@ -69,7 +73,9 @@ const formatMessageContent = (text: string) => {
 };
 
 export function MessagesComponent(props: MessagesComponentsProps) {
+  const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
+  const { sessionId, mode } = useAppSelector((state) => state.chat);
 
   return (
     <div className="p-6 flex flex-col gap-6">
@@ -123,23 +129,30 @@ export function MessagesComponent(props: MessagesComponentsProps) {
                 )}
               </div>
 
-              {message.sender === "bot" && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-2 text-xs"
-                  onClick={() =>
-                    props.copyToClipboard(message.content, message.id)
-                  }
-                >
-                  {props.copiedId === message.id ? (
-                    <CheckCheck className="h-3 w-3 mr-1" />
-                  ) : (
-                    <Copy className="h-3 w-3 mr-1" />
-                  )}
-                  {props.copiedId === message.id ? "Copiado!" : "Copiar"}
-                </Button>
-              )}
+              {/* Lógica das Opções (Botões) */}
+              {message.sender === "bot" &&
+                message.options &&
+                message.options.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-chat/20">
+                    {message.options.map((option: ChatOption) => (
+                      <Button
+                        key={option.id}
+                        onClick={() => {
+                          dispatch(
+                            selectChatOption({
+                              label: option.id,
+                              sessionId,
+                              mode,
+                            }),
+                          );
+                        }}
+                        className="px-4 py-1.5 text-xs font-medium rounded-full border border-chat bg-sidebar-primary text-foreground hover:bg-background hover:text-white transition-all cursor-pointer shadow-sm active:scale-95"
+                      >
+                        {option.label}
+                      </Button>
+                    ))}
+                  </div>
+                )}
             </div>
           </div>
         ))}

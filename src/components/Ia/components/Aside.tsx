@@ -1,14 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAppDispatch } from "@/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { formatCurrencyBRL } from "@/lib/utils";
 import {
   clearProductList,
-  generateMultipleQuote,
-  removeProduct,
+  deleteMovel,
+  type ComponenteItem,
   type ProductItem,
 } from "@/store/chatSlice";
-import { Calculator, List, Trash2, X } from "lucide-react";
+import { Calculator, FileText, List, X } from "lucide-react";
+import { MovelCard } from "./Itens";
 
 interface AsideProps {
   productList: ProductItem[];
@@ -18,18 +19,32 @@ interface AsideProps {
   sessionId: string;
 }
 
-export default function Aside({
-  productList,
-  setIsSidebarOpen,
-  isLoading,
-  totalValue,
-  sessionId,
-}: AsideProps) {
+export default function Aside({ setIsSidebarOpen }: AsideProps) {
   const dispatch = useAppDispatch();
 
-  const handleGenerateQuote = () => {
-    if (productList.length === 0 || isLoading) return;
-    dispatch(generateMultipleQuote({ products: productList, sessionId }));
+  const { productList, status, sessionId, pdfUrl } = useAppSelector(
+    (state) => state.chat,
+  );
+  const isLoading = status === "loading";
+
+  const isDownloadReady = !!pdfUrl;
+
+  const handleAction = () => {
+    if (pdfUrl) {
+      // Abre o PDF em uma nova aba ou faz download
+      window.open(pdfUrl, "_blank");
+    }
+  };
+
+  // 2. Calculamos o total baseado na lista que veio da API
+  const totalValue = productList.reduce(
+    (acc, product) => acc + product.price * product.quantity,
+    0,
+  );
+
+  const handleEditComponent = (movelId: number, componente: ComponenteItem) => {
+    console.log("Editar componente:", movelId, componente.nome);
+    // Aqui abriremos o modal futuramente
   };
 
   return (
@@ -61,15 +76,8 @@ export default function Aside({
       </div>
 
       {/* Conteúdo da Lista */}
-      <div className="flex-1 overflow-hidden flex flex-col bg-background min-w-[384px]">
-        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 px-4 py-2 bg-background border-b border-slate-100 text-[11px] font-semibold text-accent-foreground uppercase tracking-wider">
-          <span>Produto</span>
-          <span className="text-center w-10">Qtd</span>
-          <span className="text-right w-20">Total</span>
-          <span className="w-8"></span>
-        </div>
-
-        <ScrollArea className="flex-1">
+      <div className="flex-1 min-h-0">
+        <ScrollArea className="h-full w-full">
           {productList.length === 0 ? (
             <div className="h-64 flex flex-col items-center justify-center text-accent-foreground gap-3 px-8 text-center mt-10">
               <div className="bg-muted p-4 rounded-full mb-2">
@@ -84,48 +92,21 @@ export default function Aside({
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100">
+            <div className="flex flex-col gap-3 p-4">
               {productList.map((product, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-[1fr_auto_auto_auto] gap-2 p-3 items-center hover:bg-slate-50 transition-colors group"
-                >
-                  <div className="flex flex-col min-w-0 pr-2">
-                    <span
-                      className="font-medium text-sm text-accent-foreground truncate"
-                      title={product.name}
-                    >
-                      {product.name}
-                    </span>
-                    {product.dimensions && (
-                      <span className="text-[10px] text-accent-foreground truncate mt-0.5">
-                        {product.dimensions}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex justify-center w-10">
-                    <span className="text-xs font-medium bg-white border border-slate-200 text-accent-foreground px-2 py-0.5 rounded shadow-sm">
-                      {product.quantity}
-                    </span>
-                  </div>
-
-                  <div className="text-sm font-semibold text-accent-foreground text-right w-20">
-                    {formatCurrencyBRL(product.price * product.quantity)}
-                  </div>
-
-                  <div className="flex justify-end w-8">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => dispatch(removeProduct(index))}
-                      disabled={isLoading}
-                      className="h-7 w-7 text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
+                <MovelCard
+                  key={`${product.id}-${index}`}
+                  product={product}
+                  onRemove={() => {
+                    dispatch(
+                      deleteMovel({
+                        sessionId,
+                        movelId: product.id,
+                      }),
+                    );
+                  }}
+                  onEditComponent={handleEditComponent}
+                />
               ))}
             </div>
           )}
@@ -133,6 +114,15 @@ export default function Aside({
       </div>
 
       <div className="p-4 bg-background border-t border-slate-200 space-y-4 min-w-[384px]">
+        {pdfUrl && (
+          <Button
+            variant="outline"
+            onClick={() => window.open(pdfUrl, "_blank")}
+            className="w-full border-chat text-chat hover:bg-chat hover:text-white transition-all cursor-pointer h-9 text-xs gap-2"
+          >
+            <FileText className="h-4 w-4" /> Visualizar PDF Gerado
+          </Button>
+        )}
         <div className="flex justify-between items-end">
           <span className="text-sm text-accent-foreground font-medium mb-1">
             Valor Estimado:
@@ -144,8 +134,8 @@ export default function Aside({
 
         <div className="space-y-2">
           <Button
-            onClick={handleGenerateQuote}
-            disabled={productList.length === 0 || isLoading}
+            onClick={handleAction}
+            disabled={!isDownloadReady || isLoading}
             className="w-full bg-sidebar-primary hover:bg-green-700 text-foreground font-bold shadow-md h-11 rounded-lg transition-all cursor-pointer"
           >
             {isLoading ? (

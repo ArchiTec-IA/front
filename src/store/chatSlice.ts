@@ -3,8 +3,44 @@ import {
   createAsyncThunk,
   type PayloadAction,
 } from "@reduxjs/toolkit";
+import type { AppDispatch, RootState } from ".";
 
 export type ChatMode = "single" | "multiple";
+
+export interface ComponenteItem {
+  nome: string;
+  categoria: string;
+  quantidade: number;
+  preco: number;
+  subtotal: number;
+}
+
+export interface MovelItem {
+  id: number;
+  nome: string;
+  dimensoes: string;
+  material: string;
+  cor: string;
+  total: number;
+  componentes: ComponenteItem[];
+}
+
+export interface ProductItem {
+  id: number;
+  name: string;
+  dimensions?: string;
+  material: string;
+  color: string;
+  price: number;
+  componentes: ComponenteItem[];
+  quantity: number;
+}
+
+export interface OrcamentoResponse {
+  moveis: MovelItem[];
+  total: number;
+  finalizado: boolean;
+}
 
 export interface ProductItem {
   name: string;
@@ -13,18 +49,27 @@ export interface ProductItem {
   dimensions?: string;
 }
 
+export interface ChatOption {
+  id: string;
+  label: string;
+}
+
 export interface Message {
   id: string;
   content: string;
   sender: "user" | "bot";
   timestamp: string;
   type: "text" | "audio";
+  options?: ChatOption[];
 }
 
 interface ChatResponse {
   response: string;
-  pdf_url: string | null;
+  pdf_ready: boolean;
+  pdf_filename?: string;
+  download_url?: string;
   session_id: string;
+  options?: ChatOption[];
 }
 
 interface ExtractProductsResponse {
@@ -41,17 +86,110 @@ export interface ChatState {
   error: string | null;
 }
 
-const API_BASE_URL = "http://quio-alb-25446701.us-east-2.elb.amazonaws.com/";
+export interface ApiError {
+  detail?: string;
+  error?: string;
+  message?: string;
+  status?: number;
+}
+
+const API_BASE_URL = "http://quio-alb-25446701.us-east-2.elb.amazonaws.com";
 const generateSessionId = () =>
   "session_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+
+export const fetchCurrentOrcamento = createAsyncThunk<
+  ProductItem[],
+  string,
+  { state: RootState }
+>("chat/fetchCurrentOrcamento", async (sessionId, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/orcamento/${sessionId}`);
+    if (!response.ok) throw new Error("Erro ao buscar itens");
+
+    const data: OrcamentoResponse = await response.json();
+
+    if (data.moveis && Array.isArray(data.moveis)) {
+      // Mapeamento explícito de tipos
+      return data.moveis.map(
+        (m): ProductItem => ({
+          id: m.id,
+          name: m.nome,
+          dimensions: m.dimensoes, // Agora ambos são 'string' sem '?'
+          material: m.material,
+          color: m.cor,
+          price: m.total,
+          quantity: 1,
+          componentes: m.componentes,
+        }),
+      );
+    }
+
+    return [];
+  } catch (error: unknown) {
+    return rejectWithValue(error);
+  }
+});
+
+export const deleteMovel = createAsyncThunk<
+  void,
+  { sessionId: string; movelId: number },
+  { dispatch: AppDispatch; rejectValue: string }
+>(
+  "chat/deleteMovel",
+  async ({ sessionId, movelId }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/orcamento/${sessionId}/remover/${movelId}`,
+        { method: "DELETE" },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Falha ao remover o móvel.");
+      }
+
+      // Após deletar no banco da AWS, atualizamos a lista local
+      dispatch(fetchCurrentOrcamento(sessionId));
+
+      dispatch(
+        sendSingleChat({
+          message: "mais",
+          sessionId,
+          mode: "single",
+        }),
+      );
+    } catch (error: unknown) {
+      return rejectWithValue(
+        error instanceof Error
+          ? error.message
+          : "Erro desconhecido ao remover o móvel.",
+      );
+    }
+  },
+);
+
+export const selectChatOption = createAsyncThunk<
+  void,
+  { label: string; sessionId: string; mode: ChatMode },
+  { dispatch: AppDispatch }
+>("chat/selectOption", async ({ label, sessionId, mode }, { dispatch }) => {
+  dispatch(
+    addMessage({
+      content: label,
+      sender: "user",
+      type: "text",
+    }),
+  );
+  dispatch(sendSingleChat({ message: label, sessionId, mode }));
+});
 
 export const sendSingleChat = createAsyncThunk<
   ChatResponse,
   { message: string; sessionId: string; mode: ChatMode },
-  { rejectValue: string }
+  { rejectValue: string; dispatch: AppDispatch }
 >(
   "chat/sendSingleChat",
-  async ({ message, sessionId }, { rejectWithValue }) => {
+  async ({ message, sessionId }, { rejectWithValue, dispatch }) => {
     const payload = {
       message,
       session_id: sessionId,
@@ -70,6 +208,8 @@ export const sendSingleChat = createAsyncThunk<
         errorData.error || "Falha ao processar a mensagem no modo único.",
       );
     }
+
+    dispatch(fetchCurrentOrcamento(sessionId));
 
     return response.json();
   },
@@ -103,10 +243,10 @@ export const extractProducts = createAsyncThunk<
 export const generateMultipleQuote = createAsyncThunk<
   ChatResponse,
   { products: ProductItem[]; sessionId: string },
-  { rejectValue: string }
+  { rejectValue: string; dispatch: AppDispatch }
 >(
   "chat/generateMultipleQuote",
-  async ({ products, sessionId }, { rejectWithValue }) => {
+  async ({ products, sessionId }, { rejectWithValue, dispatch }) => {
     const payload = {
       message: "generate_multiple_quote",
       session_id: sessionId,
@@ -126,6 +266,8 @@ export const generateMultipleQuote = createAsyncThunk<
         errorData.error || "Falha ao gerar o orçamento final.",
       );
     }
+
+    dispatch(fetchCurrentOrcamento(sessionId));
 
     return response.json();
   },
@@ -196,27 +338,30 @@ const chatSlice = createSlice({
         sendSingleChat.fulfilled,
         (state, action: PayloadAction<ChatResponse>) => {
           state.status = "succeeded";
+
+          const data = action.payload;
+
+          if (data.pdf_ready && data.download_url) {
+            state.pdfUrl = `${API_BASE_URL}${data.download_url}`;
+          }
           state.messages.push({
             id: generateSessionId(),
             content: action.payload.response,
             sender: "bot",
             timestamp: new Date().toISOString(),
             type: "text",
+            options: action.payload.options,
           });
-          state.pdfUrl = action.payload.pdf_url;
         },
       )
       .addCase(sendSingleChat.rejected, (state, action) => {
         state.status = "failed";
         state.error =
           action.payload || action.error.message || "Erro desconhecido.";
-        state.messages.push({
-          id: generateSessionId(),
-          content: `❌ Erro: ${state.error}`,
-          sender: "bot",
-          timestamp: new Date().toISOString(),
-          type: "text",
-        });
+      })
+
+      .addCase(fetchCurrentOrcamento.fulfilled, (state, action) => {
+        state.productList = action.payload;
       })
 
       // --- extractProducts ---
@@ -292,7 +437,6 @@ const chatSlice = createSlice({
             timestamp: new Date().toISOString(),
             type: "text",
           });
-          state.pdfUrl = action.payload.pdf_url;
           state.productList = [];
         },
       )

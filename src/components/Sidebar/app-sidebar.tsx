@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import * as React from "react";
 
-import { AiFileIcon, FoldersIcon, HomeIcon } from "@/assets/icons";
+import { AiFileIcon, ArchiveIcon, FoldersIcon, HomeIcon } from "@/assets/icons";
 import {
   Sidebar,
   SidebarContent,
@@ -18,58 +18,64 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useAppSelector } from "@/hooks/hooks";
+import { cn } from "@/lib/utils";
+import { useTheme } from "@/providers/theme-provider";
+import { Button } from "../ui/button";
 import { NavMain } from "./nav-main";
-import { NavProjects } from "./nav-projects";
+// import { NavProjects } from "./nav-projects";
 import { NavUser } from "./nav-user";
 import { SideBarHeader } from "./side-bar-header";
-import { cn } from "@/lib/utils";
-import { Button } from "../ui/button";
-import { useTheme } from "@/providers/theme-provider";
-
-const data = {
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Inicio",
-      url: "/home",
-      icon: <HomeIcon className="!h-6 !w-6" />,
-    },
-    {
-      title: "Pastas",
-      url: "/folders",
-      icon: <FoldersIcon className="!h-6 !w-6" />,
-    },
-    {
-      title: "ArchiAi",
-      url: "/ia",
-      icon: <AiFileIcon className="!h-6 !w-6" />,
-    },
-  ],
-  projects: [],
-};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open } = useSidebar();
   const { setTheme, theme } = useTheme();
+  const { projects } = useAppSelector((state) => state.projects);
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
+  };
+
+  const data = {
+    teams: [
+      {
+        name: "Acme Inc",
+        logo: GalleryVerticalEnd,
+        plan: "Enterprise",
+      },
+      {
+        name: "Acme Corp.",
+        logo: AudioWaveform,
+        plan: "Startup",
+      },
+      {
+        name: "Evil Corp.",
+        logo: Command,
+        plan: "Free",
+      },
+    ],
+    navMain: [
+      {
+        title: "Inicio",
+        url: "/home",
+        icon: <HomeIcon className="!h-6 !w-6" />,
+      },
+      {
+        title: "Pastas",
+        url: "/folders",
+        icon: <FoldersIcon className="!h-6 !w-6" />,
+      },
+      {
+        title: "ArchiAi",
+        url: "/ia",
+        icon: <AiFileIcon className="!h-6 !w-6" />,
+      },
+    ],
+    projects: projects.map((project) => ({
+      name: project.name,
+      url: `/ia`,
+      icon: ArchiveIcon,
+    })),
   };
 
   return (
@@ -79,7 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           className={cn(
             open
               ? "flex items-center justify-center"
-              : "flex items-center justify-center w-full"
+              : "flex items-center justify-center w-full",
           )}
         >
           <SideBarHeader isCollapsed={open} />
@@ -88,7 +94,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} open={open} />
-        <NavProjects projects={data.projects} />
+        {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
         <div className="w-full flex items-center justify-center">
