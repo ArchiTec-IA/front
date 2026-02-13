@@ -100,7 +100,7 @@ export function LoginPageComponent({
                 <Field>
                   <Button
                     type="submit"
-                    className="bg-black font-bold hover:bg-slate-950 hover:cursor-pointer"
+                    className="bg-black font-bold hover:bg-slate-950 hover:cursor-pointer text-accent-foreground"
                   >
                     Login
                   </Button>
