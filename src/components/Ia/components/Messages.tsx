@@ -14,7 +14,6 @@ type MessagesComponentsProps = {
   copyToClipboard: (content: string, messageId: string) => Promise<void>;
   copiedId?: string | null;
   messages?: Message[];
-  handleSend: (message: string) => void;
 };
 
 const formatMessageContent = (text: string) => {
