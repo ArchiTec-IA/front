@@ -93,7 +93,7 @@ export interface ApiError {
   status?: number;
 }
 
-const API_BASE_URL = "http://quio-alb-25446701.us-east-2.elb.amazonaws.com";
+const API_BASE_URL = "/api-aws";
 const generateSessionId = () =>
   "session_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 

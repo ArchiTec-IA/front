@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "http://quio-ai.us-east-2.elasticbeanstalk.com/:path*"
+      "source": "/api-aws/:path*",
+      "destination": "http://quio-alb-25446701.us-east-2.elb.amazonaws.com/:path*"
     },
     {
       "source": "/(.*)",
