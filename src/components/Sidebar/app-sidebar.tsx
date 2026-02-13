@@ -66,7 +66,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: <FoldersIcon className="!h-6 !w-6" />,
       },
       {
-        title: "QuioIa",
+        title: "Quio-IA",
         url: "/ia",
         icon: <AiFileIcon className="!h-6 !w-6" />,
       },
